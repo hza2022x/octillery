@@ -164,7 +164,7 @@ func (m *Migrator) dsnWithConnections(query sqlparser.Query) ([]*dsnWithConnecti
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	conn, err := mgr.ConnectionByTableName(query.Table())
+	conn, err := mgr.GetConnection(query.Table())
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -77,7 +77,7 @@ func (t *Tx) IsAlreadyCommittedQueryLog(log *QueryLog) (bool, error) {
 	if err != nil {
 		return false, errors.WithStack(err)
 	}
-	conn, err := t.connMgr.ConnectionByTableName(countQuery.Table())
+	conn, err := t.connMgr.GetConnection(countQuery.Table())
 	if err != nil {
 		return false, errors.WithStack(err)
 	}
@@ -121,7 +121,7 @@ func (t *Tx) ExecWithQueryLog(log *QueryLog) (Result, error) {
 	if !query.QueryType().IsWriteQuery() {
 		return nil, errors.Errorf("cannot exec query type '%s'", query.QueryType())
 	}
-	conn, err := t.connMgr.ConnectionByTableName(query.Table())
+	conn, err := t.connMgr.GetConnection(query.Table())
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -199,7 +199,7 @@ func (db *DB) connectionAndQuery(queryText string, args ...interface{}) (*connec
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
-	conn, err := db.connMgr.ConnectionByTableName(query.Table())
+	conn, err := db.connMgr.GetConnection(query.Table())
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}

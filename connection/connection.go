@@ -604,8 +604,8 @@ func (cm *DBConnectionManager) Close() error {
 	return nil
 }
 
-// ConnectionByTableName returns DBConnection instance by table name
-func (cm *DBConnectionManager) ConnectionByTableName(tableName string) (*DBConnection, error) {
+// GetConnection returns DBConnection instance by table name
+func (cm *DBConnectionManager) GetConnection(tableName string) (*DBConnection, error) {
 	conn := cm.connMap.Get(tableName)
 	if conn == nil {
 		if err := cm.open(tableName); err != nil {
@@ -621,7 +621,7 @@ func (cm *DBConnectionManager) ConnectionByTableName(tableName string) (*DBConne
 
 // SequencerConnectionByTableName returns `*sql.DB` instance by table name
 func (cm *DBConnectionManager) SequencerConnectionByTableName(tableName string) (*sql.DB, error) {
-	conn, err := cm.ConnectionByTableName(tableName)
+	conn, err := cm.GetConnection(tableName)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -633,7 +633,7 @@ func (cm *DBConnectionManager) SequencerConnectionByTableName(tableName string) 
 
 // CurrentSequenceID returns current unique id by table name of sequencer
 func (cm *DBConnectionManager) CurrentSequenceID(tableName string) (int64, error) {
-	conn, err := cm.ConnectionByTableName(tableName)
+	conn, err := cm.GetConnection(tableName)
 	if err != nil {
 		return 0, errors.WithStack(err)
 	}
@@ -645,7 +645,7 @@ func (cm *DBConnectionManager) CurrentSequenceID(tableName string) (int64, error
 
 // NextSequenceID returns next unique id by table name of sequencer
 func (cm *DBConnectionManager) NextSequenceID(tableName string) (int64, error) {
-	conn, err := cm.ConnectionByTableName(tableName)
+	conn, err := cm.GetConnection(tableName)
 	if err != nil {
 		return 0, errors.WithStack(err)
 	}
@@ -657,7 +657,7 @@ func (cm *DBConnectionManager) NextSequenceID(tableName string) (int64, error) {
 
 // IsShardTable whether sharding table or not.
 func (cm *DBConnectionManager) IsShardTable(tableName string) bool {
-	conn, err := cm.ConnectionByTableName(tableName)
+	conn, err := cm.GetConnection(tableName)
 	if err != nil {
 		return false
 	}
@@ -671,13 +671,13 @@ func (cm *DBConnectionManager) IsEqualShardColumnToShardKeyColumn(tableName stri
 
 // ShardColumnName returns shard_column value by table name
 func (cm *DBConnectionManager) ShardColumnName(tableName string) string {
-	conn, _ := cm.ConnectionByTableName(tableName)
+	conn, _ := cm.GetConnection(tableName)
 	return conn.ShardColumnName
 }
 
 // ShardKeyColumnName returns shard_key value by table name
 func (cm *DBConnectionManager) ShardKeyColumnName(tableName string) string {
-	conn, _ := cm.ConnectionByTableName(tableName)
+	conn, _ := cm.GetConnection(tableName)
 	if conn.ShardKeyColumnName == "" {
 		return conn.ShardColumnName
 	}
@@ -706,6 +706,7 @@ func (cm *DBConnectionManager) setConnectionSettings(conn *sql.DB) {
 	conn.SetConnMaxLifetime(cm.connMaxLifetime)
 }
 
+// TODO 应根据逻辑库名映射连接
 func (cm *DBConnectionManager) openShardConnection(tableName string, table *config.TableConfig) error {
 	var seqConn *sql.DB
 	if table.IsUsedSequencer() {

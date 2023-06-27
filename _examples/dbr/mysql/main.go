@@ -2,13 +2,10 @@ package main
 
 import (
 	"errors"
+	"github.com/gocraft/dbr"
+	//"go.knocknote.io/octillery"
 	"go.knocknote.io/octillery/connection/adapter"
 	"go.knocknote.io/octillery/connection/adapter/plugin"
-	"path/filepath"
-
-	"github.com/gocraft/dbr"
-	"go.knocknote.io/octillery"
-	"go.knocknote.io/octillery/path"
 )
 
 type Member struct {
@@ -28,9 +25,10 @@ CREATE TABLE IF NOT EXISTS members(
 
 func main() {
 	adapter.Register("mysql", &plugin.MySQLAdapter{})
-	if err := octillery.LoadConfig(filepath.Join(path.ThisDirPath(), "databases.yml")); err != nil {
-		panic(err)
-	}
+	//debug.SetDebug(true)
+	//if err := octillery.LoadConfig(filepath.Join(path.ThisDirPath(), "databases.yml")); err != nil {
+	//	panic(err)
+	//}
 	conn, err := dbr.Open("mysql", "root:root@tcp(localhost:13306)/test", nil)
 	if err != nil {
 		panic(err)

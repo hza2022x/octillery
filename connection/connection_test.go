@@ -157,9 +157,9 @@ func TestGetConnection(t *testing.T) {
 	checkErr(t, err)
 	defer mgr.Close()
 	t.Run("connection by users table", func(t *testing.T) {
-		conn, err := mgr.ConnectionByTableName("users")
+		conn, err := mgr.GetConnection("users")
 		checkErr(t, err)
-		if c, _ := mgr.ConnectionByTableName("users"); c != conn {
+		if c, _ := mgr.GetConnection("users"); c != conn {
 			t.Fatal("cannot fetch same instance")
 		}
 		if conn.ShardConnections.ShardNum() != 2 {
@@ -181,7 +181,7 @@ func TestGetConnection(t *testing.T) {
 		}
 	})
 	t.Run("connection by user_stages table", func(t *testing.T) {
-		if _, err := mgr.ConnectionByTableName("user_stages"); err != nil {
+		if _, err := mgr.GetConnection("user_stages"); err != nil {
 			t.Fatalf("%+v\n", err)
 		}
 	})
@@ -217,7 +217,7 @@ func TestNextSequenceID(t *testing.T) {
 		t.Fatal("cannot get next sequence id")
 	}
 	{
-		conn, err := mgr.ConnectionByTableName("users")
+		conn, err := mgr.GetConnection("users")
 		checkErr(t, err)
 		id, err := conn.NextSequenceID("users")
 		checkErr(t, err)
@@ -243,7 +243,7 @@ func TestEqualDSN(t *testing.T) {
 	mgr, err := NewConnectionManager()
 	checkErr(t, err)
 	defer mgr.Close()
-	conn, err := mgr.ConnectionByTableName("users")
+	conn, err := mgr.GetConnection("users")
 	checkErr(t, err)
 	t.Run("same instance", func(t *testing.T) {
 		if !conn.EqualDSN(conn) {
@@ -254,7 +254,7 @@ func TestEqualDSN(t *testing.T) {
 		mgr, err := NewConnectionManager()
 		checkErr(t, err)
 		defer mgr.Close()
-		anotherConn, err := mgr.ConnectionByTableName("users")
+		anotherConn, err := mgr.GetConnection("users")
 		checkErr(t, err)
 		if !conn.EqualDSN(anotherConn) {
 			t.Fatal("cannot work equal dsn")
@@ -278,7 +278,7 @@ func TestIsEqualShardColumnToShardKeyColumn(t *testing.T) {
 	if !mgr.IsEqualShardColumnToShardKeyColumn("user_stages") {
 		t.Fatal("cannot set shard_column and shard_key")
 	}
-	conn, err := mgr.ConnectionByTableName("users")
+	conn, err := mgr.GetConnection("users")
 	checkErr(t, err)
 	if !conn.IsEqualShardColumnToShardKeyColumn() {
 		t.Fatal("cannot set shard_column and shard_key")
@@ -289,7 +289,7 @@ func TestShardConnectionByID(t *testing.T) {
 	mgr, err := NewConnectionManager()
 	checkErr(t, err)
 	defer mgr.Close()
-	conn, err := mgr.ConnectionByTableName("users")
+	conn, err := mgr.GetConnection("users")
 	checkErr(t, err)
 	{
 		shardConn, err := conn.ShardConnectionByID(1)
@@ -350,7 +350,7 @@ func TestQuery(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	t.Run("not sharding table", func(t *testing.T) {
-		conn, err := mgr.ConnectionByTableName("user_stages")
+		conn, err := mgr.GetConnection("user_stages")
 		checkErr(t, err)
 		t.Run("without context", func(t *testing.T) {
 			rows, err := conn.Query(nil, "select * from user_stages")
@@ -376,7 +376,7 @@ func TestQueryRow(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	t.Run("not sharding table", func(t *testing.T) {
-		conn, err := mgr.ConnectionByTableName("user_stages")
+		conn, err := mgr.GetConnection("user_stages")
 		checkErr(t, err)
 		t.Run("without context", func(t *testing.T) {
 			conn.QueryRow(nil, "select * from user_stages where user_id = 1")
@@ -394,7 +394,7 @@ func TestPrepare(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	t.Run("not sharding table", func(t *testing.T) {
-		conn, err := mgr.ConnectionByTableName("user_stages")
+		conn, err := mgr.GetConnection("user_stages")
 		checkErr(t, err)
 		t.Run("without context", func(t *testing.T) {
 			stmt, err := conn.Prepare(nil, "select * from user_stages where user_id = ?")
@@ -416,7 +416,7 @@ func TestExec(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	t.Run("not sharding table", func(t *testing.T) {
-		conn, err := mgr.ConnectionByTableName("user_stages")
+		conn, err := mgr.GetConnection("user_stages")
 		checkErr(t, err)
 		t.Run("without context", func(t *testing.T) {
 			result, err := conn.Exec(nil, "update user_stages set name = 'alice' where user_id = ?")
@@ -443,7 +443,7 @@ func TestTransaction(t *testing.T) {
 	mgr, err := NewConnectionManager()
 	checkErr(t, err)
 	defer mgr.Close()
-	conn, err := mgr.ConnectionByTableName("user_stages")
+	conn, err := mgr.GetConnection("user_stages")
 	checkErr(t, err)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

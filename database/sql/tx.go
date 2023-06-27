@@ -98,7 +98,7 @@ func (proxy *Tx) connectionAndQuery(queryText string, args ...interface{}) (*con
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
-	conn, err := proxy.connMgr.ConnectionByTableName(query.Table())
+	conn, err := proxy.connMgr.GetConnection(query.Table())
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}

@@ -37,13 +37,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if db != nil {
-		if _, err := db.Exec(SQL_CREATE); err != nil {
-			panic(err)
-		}
-	}
+	//if db != nil {
+	//	if _, err := db.Exec(SQL_CREATE); err != nil {
+	//		panic(err)
+	//	}
+	//}
 
-	result, err := db.Exec("select * from product limit 1")
+	result, err := db.Query("select * from members where id=1 limit 1")
 	if err == nil {
 		fmt.Println(result)
 	} else {

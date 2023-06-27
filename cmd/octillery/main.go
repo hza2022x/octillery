@@ -136,7 +136,7 @@ func (cmd *ImportCommand) schemaFromTableName(tableName string) (vtparser.Statem
 		return nil, errors.WithStack(err)
 	}
 	defer mgr.Close()
-	conn, err := mgr.ConnectionByTableName(tableName)
+	conn, err := mgr.GetConnection(tableName)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

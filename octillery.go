@@ -45,7 +45,7 @@ func Exec(db *osql.DB, queryText string) ([]*sql.Rows, sql.Result, error) {
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
-	conn, err := connMgr.ConnectionByTableName(query.Table())
+	conn, err := connMgr.GetConnection(query.Table())
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
