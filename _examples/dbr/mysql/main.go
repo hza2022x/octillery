@@ -18,24 +18,26 @@ type Member struct {
 	IsValid bool   `db:"is_valid"`
 }
 
-func main() {
-	adapter.Register("mysql", &plugin.MySQLAdapter{})
-	if err := octillery.LoadConfig(filepath.Join(path.ThisDirPath(), "databases.yml")); err != nil {
-		panic(err)
-	}
-	conn, err := dbr.Open("mysql", "root:@tcp(127.0.0.1:13306)/test", nil)
-	if err != nil {
-		panic(err)
-	}
-	sess := conn.NewSession(nil)
-	if conn.DB != nil {
-		if _, err := conn.DB.Exec(`
+const SQL_CREATE = `
 CREATE TABLE IF NOT EXISTS members(
     id integer NOT NULL PRIMARY KEY AUTO_INCREMENT,
     number integer NOT NULL,
     name varchar(255),
     is_valid tinyint(1) NOT NULL
-)`); err != nil {
+)`
+
+func main() {
+	adapter.Register("mysql", &plugin.MySQLAdapter{})
+	if err := octillery.LoadConfig(filepath.Join(path.ThisDirPath(), "databases.yml")); err != nil {
+		panic(err)
+	}
+	conn, err := dbr.Open("mysql", "root:root@tcp(localhost:13306)/test", nil)
+	if err != nil {
+		panic(err)
+	}
+	sess := conn.NewSession(nil)
+	if conn.DB != nil {
+		if _, err := conn.DB.Exec(SQL_CREATE); err != nil {
 			panic(err)
 		}
 	}
@@ -45,7 +47,7 @@ CREATE TABLE IF NOT EXISTS members(
 
 	result, err := sess.InsertInto("members").
 		Columns("id", "number", "name", "is_valid").
-		Values(0, 10, "Bob", true).
+		Values(1, 10, "Bob", true).
 		Exec()
 	if err != nil {
 		panic(err)
@@ -59,7 +61,7 @@ CREATE TABLE IF NOT EXISTS members(
 		panic(errors.New("cannot insert row"))
 	}
 
-	member := &Member{0, 9, "Ken", false}
+	member := &Member{2, 9, "Ken", false}
 
 	sess.InsertInto("members").
 		Columns("id", "number", "name", "is_valid").
