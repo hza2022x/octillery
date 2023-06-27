@@ -1,5 +1,5 @@
 default: &default
-  database: test
+  database: octillery_dbr
   adapter: mysql
   encoding: utf8
   username: root
@@ -11,7 +11,7 @@ tables:
   members:
     shard: true
     shard_column: id
-    algorithm: hashmap
+    algorithm: modulo
     sequencer:
       <<: *default
       database: octillery_dbr_members_seq

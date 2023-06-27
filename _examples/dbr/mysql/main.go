@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"go.knocknote.io/octillery/connection/adapter"
+	"go.knocknote.io/octillery/connection/adapter/plugin"
 	"path/filepath"
 
 	"github.com/gocraft/dbr"
@@ -17,10 +19,11 @@ type Member struct {
 }
 
 func main() {
+	adapter.Register("mysql", &plugin.MySQLAdapter{})
 	if err := octillery.LoadConfig(filepath.Join(path.ThisDirPath(), "databases.yml")); err != nil {
 		panic(err)
 	}
-	conn, err := dbr.Open("mysql", "root:@tcp(127.0.0.1:3306)/mydb", nil)
+	conn, err := dbr.Open("mysql", "root:@tcp(127.0.0.1:13306)/test", nil)
 	if err != nil {
 		panic(err)
 	}
