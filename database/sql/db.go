@@ -19,12 +19,12 @@ type DB struct {
 }
 
 // Open the compatible method of Open in 'database/sql' package.
-func Open(driverName, dataSourceName string) (*DB, error) {
+func Open(driverName, queryString string) (*DB, error) {
 	mgr, err := connection.NewConnectionManager()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	if err := mgr.SetQueryString(dataSourceName); err != nil {
+	if err := mgr.SetQueryString(queryString); err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return &DB{connMgr: mgr}, nil

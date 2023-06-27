@@ -5,14 +5,10 @@ package octillery
 
 import (
 	"database/sql"
-	"os"
-	"strconv"
-
 	"github.com/pkg/errors"
 	"go.knocknote.io/octillery/config"
 	"go.knocknote.io/octillery/connection"
 	osql "go.knocknote.io/octillery/database/sql"
-	"go.knocknote.io/octillery/debug"
 	"go.knocknote.io/octillery/exec"
 	_ "go.knocknote.io/octillery/plugin" // load database adapter plugin
 	"go.knocknote.io/octillery/sqlparser"
@@ -29,8 +25,6 @@ const Version = "v1.1.1"
 //
 // Configuration format see go.knocknote.io/octillery/config
 func LoadConfig(configPath string) error {
-	isDebug, _ := strconv.ParseBool(os.Getenv("OCTILLERY_DEBUG"))
-	debug.SetDebug(isDebug)
 	cfg, err := config.Load(configPath)
 	if err != nil {
 		return errors.WithStack(err)
